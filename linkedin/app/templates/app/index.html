@@ -1,0 +1,80 @@
+{% extends'index.html' %}
+{% block body %}
+    <div class="col-md-6 mx-auto">
+        <div id="app" class="mt-5">
+            <div class="text-center">
+                <img class="img-fluid" width="800" height="800"
+                     src="https://www.pngkey.com/png/full/25-258705_configure-the-linkedin-plugin-salesforce-bot.png"
+                     alt="">
+            </div>
+            <div class="card mt-2 shadow-sm">
+                <div class="card-header h5 text-center">
+                    LinkedIn Python Bot with Selenium
+                </div>
+                <div class="card-body text-center">
+                    <div v-if="loading" class="p-3">
+                        <img src="https://cdn.dribbble.com/users/561/screenshots/3571000/robot.gif"
+                             width="200" alt="">
+                        <h5>Loading...</h5>
+                    </div>
+                    <form @submit.prevent="submit">
+                        <input  required v-model="search" class="form-control" type="text"
+                               placeholder="Enter Company Name">
+                        <br>
+                        <button :disabled="loading" class="btn btn-md btn-primary">Submit</button>
+                        <button  class="btn btn-md btn-danger">Reset</button>
+                    </form>
+                    <div v-if="companies.length > 0">
+                        <h6 class="pt-3">Companies</h6>
+                        <hr>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item" v-for="(company,index) in companies" :key="index">
+                                <p>[[company]]
+                                    <button @click="retrieve(index)" class="btn btn-danger">Request Info</button>
+                                </p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                loading: false,
+                search: "",
+                searchable: true,
+                companies: []
+            },
+            methods: {
+                submit() {
+                    this.loading = true
+                    axios.get('{{ url_for('app.search') |safe}}', {params: {q: this.search}}).then(({data}) => {
+                        this.companies = data
+                        this.loading = false
+                    }).catch(() => {
+                        this.loading = false
+                    })
+                },
+                retrieve(index) {
+                    this.loading = true
+                    axios.get('{{ url_for('app.retrieve')|safe }}', {
+                        params: {
+                            id: index,
+                            q: this.search
+                        }
+                    }).then(({data}) => {
+                        this.loading = false
+                        console.log(data)
+                    }).catch(() => {
+                        this.loading = false
+                    })
+                }
+            },
+            delimiters: ['[[', ']]']
+        })
+    </script>
+{% endblock %}
