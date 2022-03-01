@@ -11,16 +11,29 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 
 class Bot:
+    """
+    Python class to retrieve employee information from company on  linkedin
+    """
     LINKED_IN = "https://www.linkedin.com/login"
     home = None
     search_to_list = None
 
     def __init__(self, _driver, wait=100):
+        """
+
+        :param _driver: selenium driver  and wait
+        :param wait:  time given to wait for elements to appear on dom
+        """
         self._driver = _driver
         self.wait = wait
 
     @staticmethod
-    def fdate(date):
+    def fdate(date: str):
+        """
+        formats date to "start" and "end"
+        :param date:
+        :return:
+        """
         start = None
         end = None
         if '·' in date:
@@ -42,6 +55,13 @@ class Bot:
             return start, end
 
     def login(self, _username, _password, endpoint=LINKED_IN):
+        """
+        login into linkedin to retrieve employee information of company
+        :param _username:
+        :param _password:
+        :param endpoint:
+        :return:
+        """
         try:
             self._driver.get(endpoint)
             username = self._driver.find_element(By.ID, 'username')
@@ -54,6 +74,13 @@ class Bot:
             traceback.print_exc()
 
     def check_element(self, current_driver, *args, **kwargs):
+        """
+        check element and prevent exception from throwing returns None if doesnt exists
+        :param current_driver:
+        :param args:
+        :param kwargs:
+        :return:
+        """
         try:
             return current_driver.find_element(*args, **kwargs)
         except AttributeError as e:
@@ -62,6 +89,13 @@ class Bot:
             return None
 
     def check_elements(self, current_driver, *args, **kwargs):
+        """
+        check elements and prevent exception from throwing returns None if doesnt exists
+        :param current_driver:
+        :param args:
+        :param kwargs:
+        :return:
+        """
         try:
             return current_driver.find_elements(*args, **kwargs)
         except AttributeError as e:
@@ -70,6 +104,11 @@ class Bot:
             return None
 
     def search(self, param: str):
+        """
+        searches for company and list them
+        :param param:
+        :return:
+        """
         try:
             element_present = expected_conditions.presence_of_element_located(
                 (By.CSS_SELECTOR, 'input[aria-label="Search"]'))
@@ -90,7 +129,9 @@ class Bot:
                                       '/html/body/div[6]/div[3]/div/div[2]/div/div[1]/main/div/div/div[1]/ul/li')
             self.search_to_list = list(map(
                 lambda x: self.check_element(x[1], By.XPATH,
-                                             f'//li[{x[0] + 1}]/div/div/div[2]/div[1]/div[1]/div/span/span/a').text,
+                                             f'//li[{x[0] + 1}]/div/div/div[2]/div[1]/div[1]/div/span/span/a').text if self.check_element(
+                    x[1], By.XPATH,
+                    f'//li[{x[0] + 1}]/div/div/div[2]/div[1]/div[1]/div/span/span/a') else '',
                 enumerate(res)))
 
             return res
@@ -99,6 +140,12 @@ class Bot:
             traceback.print_exc()
 
     def _make_files(self, company_name, data):
+        """
+        make report files using company name and create subdirectories folders for each employee
+        :param company_name:
+        :param data:
+        :return:
+        """
         directory_name = data.get('name').replace('/', '-')
         current_dir = os.getcwd()
         path = os.path.join(current_dir, company_name, directory_name)
@@ -135,6 +182,10 @@ class Bot:
             f.close()
 
     def _employees_retrievable(self):
+        """
+        Handles retrieving employees from a company
+        :return:
+        """
         element_present = expected_conditions.presence_of_element_located(
             (By.CSS_SELECTOR, 'a[class="app-aware-link"]'))
         WebDriverWait(self._driver, self.wait).until(element_present)
@@ -146,6 +197,11 @@ class Bot:
         return current_employees
 
     def _project_retrievable(self, profile):
+        """
+        Handles retrieving employee's projects
+        :param profile:
+        :return:
+        """
         projs = []
         try:
             self._driver.get(profile + 'details/projects/')
@@ -185,7 +241,12 @@ class Bot:
             traceback.print_exc()
             pass
 
-    def _experience_retrievable(self, profile, ):
+    def _experience_retrievable(self, profile):
+        """
+        Handles retrieving employee's experience information
+        :param profile:
+        :return:
+        """
         exps = []
         try:
             self._driver.get(profile + 'details/experience/')
@@ -224,6 +285,11 @@ class Bot:
             print(e)
 
     def _education_retrievable(self, profile):
+        """
+                Handles retrieving employee's education information
+        :param profile:
+        :return:
+        """
         edus = []
         try:
             self._driver.get(profile + 'details/education/')
@@ -248,12 +314,12 @@ class Bot:
                                                  f'//li[{index}]/div/div[2]/div[2]/ul/li[1]/div/div/div/div/div/span[1]')
 
                     college_link = self.check_element(i, By.XPATH,
-                                                      f'//li[{index}]/div/div[1]/a').get_attribute(
-                        'href')
+                                                      f'//li[{index}]/div/div[1]/a')
 
                     education_data = {
                         'college': college.text if college else '',
-                        'college_url': college_link if college_link else '',
+                        'college_url': college_link.get_attribute(
+                            'href') if college_link else '',
                         'degree': degree.text if degree else '',
                         'start': self.fdate(date.text)[0] if date else '',
                         'end': self.fdate(date.text)[1] if date else '',
@@ -268,6 +334,11 @@ class Bot:
             pass
 
     def exec(self, company: WebElement):
+        """
+        Execute retrieval of information and goes to the next page till all employees are retrieved
+        :param company:
+        :return:
+        """
         try:
             company = self.check_element(company, By.XPATH, '//div/div/div[2]/div[1]/div[1]/div/span/span/a')
             company_name = company.text.replace('/', '-')
@@ -293,6 +364,7 @@ class Bot:
                             'educ': [],
                             'pro': []}
                     }
+                    # avoid profiles that account cant see
                     if 'headless' in i:
                         continue
                     self._driver.get(i)
@@ -344,7 +416,6 @@ class Bot:
 if __name__ == "__main__":
     PATH = 'drivers/geckodriver.exe'
     driver = webdriver.Firefox(executable_path=PATH)
-
     bot = Bot(driver)
     bot.login(_username=os.environ.get('_USERNAME'), _password=os.environ.get('_PASSWORD'))
     search = bot.search("Unacademy")

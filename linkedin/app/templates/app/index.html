@@ -18,11 +18,11 @@
                         <h5>Loading...</h5>
                     </div>
                     <form @submit.prevent="submit">
-                        <input  required v-model="search" class="form-control" type="text"
+                        <input required v-model="search" class="form-control" type="text"
                                placeholder="Enter Company Name">
                         <br>
                         <button :disabled="loading" class="btn btn-md btn-primary">Submit</button>
-                        <button  class="btn btn-md btn-danger">Reset</button>
+                        <button @click="reset()"  type="button" class="btn btn-md btn-danger">Reset</button>
                     </form>
                     <div v-if="companies.length > 0">
                         <h6 class="pt-3">Companies</h6>
@@ -46,15 +46,20 @@
             data: {
                 loading: false,
                 search: "",
-                searchable: true,
                 companies: []
             },
             methods: {
+                reset() {
+                    this.loading = false
+                    this.companies = []
+                    this.search = ""
+                },
                 submit() {
                     this.loading = true
                     axios.get('{{ url_for('app.search') |safe}}', {params: {q: this.search}}).then(({data}) => {
                         this.companies = data
                         this.loading = false
+                        alert('Search has been completed successfully')
                     }).catch(() => {
                         this.loading = false
                     })
@@ -68,7 +73,7 @@
                         }
                     }).then(({data}) => {
                         this.loading = false
-                        console.log(data)
+                        alert('Task has been completed check application directory')
                     }).catch(() => {
                         this.loading = false
                     })

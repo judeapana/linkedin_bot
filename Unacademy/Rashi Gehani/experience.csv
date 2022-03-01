@@ -1,0 +1,9 @@
+position,company,company_url,location,start,end,detail
+,,https://www.linkedin.com/company/10369067/,,,,
+,,https://www.linkedin.com/company/497017/,,,,
+Summer Intern,Morgan Stanley,https://www.linkedin.com/company/497017/,"Mumbai Area, India",May 2017 , Jul 2017 ,"Created a generic bulk update service using which a user can pass multiple rows of data 
+instead of initiating requests for each individual rows. It accepts bulk data in generic form, processes accordingly to the type and pass it on to the owning service to actually save the data."
+Summer Research Intern (Sponsored by Microsoft Research (MSR)),IIT Hyderabad,https://www.linkedin.com/company/9012595/,,May 2016 , Jun 2016 ,"On supporting multi-hop communication in the AllJoyn framework for Proximity Based Networks-
+
+AllJoyn is an open source software framework that makes it easy for devices and 
+applications to discover and communicate with each other. We did an enhancement (Realization of Multi Hop Communication in the AllJoyn framework using the B.A.T.M.A.N protocol) in the framework that could be significant in various practical applications of the framework and leads to potential new applications where in the framework could be leveraged."
