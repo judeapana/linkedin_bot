@@ -228,4 +228,6 @@ dmypy.json
 cython_debug/
 .env
 geckodriver.log
-!/.idea/
+/.idea/
+linkedin/static/
+static/
