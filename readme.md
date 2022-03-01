@@ -3,10 +3,10 @@ This application is built using Flask (Python) Framework and selenium to retriev
 
 ![Home Index](img/Home.PNG "Application Homepage")
 
-#####This application logs into the linkedin website using selenium to retrieve a company's employee information
-#####It creates an output file(.csv) of all employees and separately creates an experience.csv,projects.csv and education.csv which contains their experience,projects and education information respectively
+This application logs into the linkedin website using selenium to retrieve a company's employee information\
+It creates an output file(.csv) of all employees and separately creates an experience.csv,projects.csv and education.csv which contains their experience,projects and education information respectively
 
-##Setup and Usage
+## **Setup and Usage**
 * Once you clone the repository ``git clone git@github.com:judeapana/linkedin_bot.git``
 * Create environment depending on the package manager you want to use.
 * Install requirements.txt file ``pip install -r requirements.txt``
